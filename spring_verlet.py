@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # mass, spring constant, initial position and velocity
 m = 1
 k = 1
-x = 0
+x = 0 # value of x at time t = t + dt, taken from Euler integration
 v = 1
 
 # simulation time, timestep and time
@@ -14,11 +14,13 @@ t_max = 100
 dt = 0.1
 t_array = np.arange(0, t_max, dt)
 
+x_prev = x - v*dt
+
 # initialise empty lists to record trajectories
 x_list = []
 v_list = []
 
-# Euler integration
+# Verlet integration
 for t in t_array:
 
     # append current state to trajectories
@@ -27,9 +29,10 @@ for t in t_array:
 
     # calculate new position and velocity
     a = -k * x / m
-    v_new = v + a * dt
-    x = x + v_new * dt
-    v = v_new
+    x_new = 2*x - x_prev + a * (dt**2)
+    v = (x_new - x_prev)/(2*dt)
+    x_prev = x
+    x = x_new
 
 # convert trajectory lists into arrays, so they can be sliced (useful for Assignment 2)
 x_array = np.array(x_list)
@@ -44,5 +47,3 @@ plt.plot(t_array, x_array, label='x (m)')
 plt.plot(t_array, v_array, label='v (m/s)')
 plt.legend()
 plt.show()
-
-print(x_list)
