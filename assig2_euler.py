@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# mass, spring constant, initial position and velocity
+# constants
 m = 1
 G = 6.6743e-11
 M = 6.42e23
