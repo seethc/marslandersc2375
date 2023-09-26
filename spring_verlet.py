@@ -14,8 +14,8 @@ x_anal = x
 #v_anal = v
 
 # simulation time, timestep and time
-t_max = 1000
-dt = 0.8
+t_max = 100
+dt = 0.1
 t_array = np.arange(0, t_max, dt)
 
 x_prev = x - v*dt
@@ -37,6 +37,9 @@ for t in t_array:
     a = -k * x / m
     x_new = 2*x - x_prev + a * (dt**2)
     v = (x_new - x_prev)/(2*dt)
+
+    print(t, x, v)
+
     x_prev = x
     x = x_new
 

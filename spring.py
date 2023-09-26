@@ -1,5 +1,10 @@
 # uncomment the next line if running in a notebook
 # %matplotlib inline
+
+import time
+
+# Record the start time
+start_time = time.time()
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -52,7 +57,7 @@ v_array = np.array(v_list)
 x_anal_array = np.array(x_anal_list)
 v_anal_array = np.array(v_anal_list)
 
-# plot the position-time graph
+"""# plot the position-time graph
 plt.figure(1)
 plt.clf()
 plt.xlabel('time (s)')
@@ -64,4 +69,11 @@ plt.plot(t_array, v_anal_array, label='v analy (m/s)')
 plt.legend()
 plt.show()
 
-print(x_list)
+print(x_list)"""
+
+# Record the end time
+end_time = time.time()
+
+# Calculate the execution time
+execution_time = end_time - start_time
+print(f"Total Execution Time: {execution_time} seconds")
