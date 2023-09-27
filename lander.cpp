@@ -24,7 +24,44 @@ void numerical_dynamics (void)
   // This is the function that performs the numerical integration to update the
   // lander's pose. The time step is delta_t (global variable).
 {
-  // INSERT YOUR CODE HERE
+    // Declare variables
+    double atmo_density, fuel_mass, current_mass, t;
+    vector3d gravity, thrust, drag, force, acceleration, current_position, position_new;
+    static vector3d position_prev;
+    t=0;
+    fuel_mass = (FUEL_CAPACITY - FUEL_RATE_AT_MAX_THRUST * t) * FUEL_DENSITY;
+    current_mass = UNLOADED_LANDER_MASS + fuel_mass;
+    gravity = -GRAVITY * MARS_MASS * current_mass * position.norm() / position.abs2();
+    thrust = thrust_wrt_world();
+    atmo_density = atmospheric_density(position);
+
+    if (parachute_status == NOT_DEPLOYED) {
+        drag = -0.5 * atmo_density * DRAG_COEF_LANDER * (M_PI * 1) * velocity.abs2() * velocity.norm(); // LANDER_SIZE = 1
+    }
+    else {
+      drag = -0.5 * atmo_density * ((DRAG_COEF_CHUTE * 5 * 4) + (DRAG_COEF_LANDER * (M_PI * 1))) * velocity.abs2() * velocity.norm(); // Chute size is (2*LANDER_SIZE)**2 * 5
+    }
+
+    force = gravity + thrust + drag;
+    acceleration = force/current_mass;
+
+    // Euler
+    //current_position = position;
+    //position = position + delta_t*velocity;
+    //velocity = velocity + delta_t*acceleration;
+
+    // Verlet
+    current_position = position;
+    if (simulation_time != 0) {
+      position_new = 2 * position - position_prev + acceleration * (delta_t * delta_t);
+    }
+    else {
+      position_prev = position - velocity * delta_t;
+      position_new = 2 * position - position_prev + acceleration * (delta_t * delta_t);
+    }
+    velocity = (position - position_prev)/(delta_t);
+    position_prev = position;
+    position = position_new;
 
   // Here we can apply an autopilot to adjust the thrust, parachute and attitude
   if (autopilot_enabled) autopilot();
