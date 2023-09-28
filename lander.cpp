@@ -13,12 +13,43 @@
 // ahg@eng.cam.ac.uk and gc121@eng.cam.ac.uk.
 
 #include "lander.h"
+#include <vector>
+vector<double> height_list;
+vector<double> descent_rate_list;
 
 void autopilot (void)
   // Autopilot to adjust the engine throttle, parachute and attitude control
 {
-  // INSERT YOUR CODE HERE
-}
+  // Delcare variables
+  double Kh, Kp, Delta, e, descent_rate, Pout;
+
+  Kh = 0.035;
+  Kp = 0.5;
+  Delta = 0.6;
+  descent_rate = velocity * position.norm();
+  e = -(0.5 + Kh * (position.abs() - MARS_RADIUS) + descent_rate);
+
+  Pout = Kp * e;
+  if (Pout <= -Delta)
+    {
+        // Throttle is 0 when Pout is less than or equal to -Delta
+        throttle = 0;
+    }
+    else if (-Delta < Pout && Pout < 1.0 - Delta)
+    {
+        // Throttle is Delta + Pout when Pout is within the range (-Delta, 1-Delta)
+        throttle = Delta + Pout;
+    }
+    else
+    {
+        // Throttle is 1 when Pout is greater than or equal to 1 - Delta
+        throttle = 1;
+    }
+
+    // Apply the throttle control
+    
+  
+  }
 
 void numerical_dynamics (void)
   // This is the function that performs the numerical integration to update the
@@ -52,11 +83,11 @@ void numerical_dynamics (void)
 
     // Verlet
     current_position = position;
-    if (simulation_time != 0) {
+    if (simulation_time == 0) {
+      position_prev = position - velocity * delta_t;
       position_new = 2 * position - position_prev + acceleration * (delta_t * delta_t);
     }
     else {
-      position_prev = position - velocity * delta_t;
       position_new = 2 * position - position_prev + acceleration * (delta_t * delta_t);
     }
     velocity = (position - position_prev)/(delta_t);
@@ -68,6 +99,26 @@ void numerical_dynamics (void)
 
   // Here we can apply 3-axis stabilization to ensure the base is always pointing downwards
   if (stabilized_attitude) attitude_stabilization();
+
+  // Write height & descent_Rate to file
+  double height, descent_rate;
+  height = position.abs() - MARS_RADIUS;
+  descent_rate = velocity * position.norm();
+
+  height_list.push_back(height);
+  descent_rate_list.push_back(descent_rate);
+
+  ofstream fout("telemetry.txt");
+  if (fout.is_open()) { //file opened successfully
+    for (int i = 0; i < height_list.size(); i = i + 1) {
+        fout << height_list[i] << ' ' << descent_rate_list[i] << endl;
+    }
+    fout.close();
+  } 
+    else { //file did not open successfully
+      cout << "Could not open telemetry file for writing" << endl;
+    }
+  
 }
 
 void initialize_simulation (void)
