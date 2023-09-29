@@ -108,16 +108,16 @@ void numerical_dynamics (void)
   height_list.push_back(height);
   descent_rate_list.push_back(descent_rate);
 
-  ofstream fout("telemetry.txt");
+  ofstream fout("telemetry2.txt");
   if (fout.is_open()) { //file opened successfully
-    for (int i = 0; i < height_list.size(); i = i + 1) {
-        fout << height_list[i] << ' ' << descent_rate_list[i] << endl;
-    }
-    fout.close();
-  } 
-    else { //file did not open successfully
+      for (int i = 0; i < height_list.size(); i = i + 1) {
+          fout << height_list[i] << ' ' << descent_rate_list[i] << endl;
+      }
+      fout.close();
+  }
+  else { //file did not open successfully
       cout << "Could not open telemetry file for writing" << endl;
-    }
+  }
   
 }
 
@@ -225,3 +225,4 @@ void initialize_simulation (void)
 
   }
 }
+
