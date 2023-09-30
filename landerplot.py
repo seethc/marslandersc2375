@@ -6,7 +6,7 @@ file_path = 'telemetry.txt'
 height_list = []
 descent_rate_list = []
 
-# Load data from the .txt file (assuming it's named telemetry.txt)
+# Load data from the .txt file
 data = np.loadtxt('telemetry.txt', delimiter=' ')
 height_list, descent_rate_list = data[:, 0], data[:, 1]
 
@@ -18,11 +18,16 @@ plt.figure(figsize=(8, 6))
 # Plot target descent rates for different Kh values
 for kh in kh_values:
     target_rate = -0.5 - kh * height_list
-    plt.plot(height_list, target_rate, label=f'Target (Kh={kh})')
+    plt.plot(height_list, target_rate, '--', label=f'Target (Kh={kh})')
 
+# Load data from the .txt file
+data = np.loadtxt('telemetry.txt', delimiter=' ')
+data = sorted(data, key=lambda x: x[0])
+# height_list, descent_rate_list = data[:, 0], data[:, 1]
+height_list, descent_rate_list = zip(*data)
 
 # Create the plot
-plt.plot(height_list, descent_rate_list, '--',label='Descent Rate')
+plt.plot(height_list, descent_rate_list,label='Descent Rate')
 plt.xlabel('Height (m)')
 plt.ylabel('Vertical Velocity (m/s)')
 plt.title('Vertical Velocity vs. Height')
