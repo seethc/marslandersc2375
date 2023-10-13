@@ -16,15 +16,19 @@
 #include <vector>
 vector<double> height_list;
 vector<double> descent_rate_list;
+ofstream fout("telemetryX5.txt");
 
 void autopilot (void)
   // Autopilot to adjust the engine throttle, parachute and attitude control
 {
   // Delcare variables
+  //double mass = UNLOADED_LANDER_MASS + fuel * FUEL_CAPACITY * FUEL_DENSITY;
+  //double gravity = GRAVITY * MARS_MASS * mass / position.abs2();
+
   double Kh, Kp, Delta, e, descent_rate, Pout;
 
-  Kh = 0.035;
-  Kp = 0.5;
+  Kh = 0.018993;
+  Kp = 1;
   Delta = 0.6;
   descent_rate = velocity * position.norm();
   e = -(0.5 + Kh * (position.abs() - MARS_RADIUS) + descent_rate);
@@ -47,8 +51,11 @@ void autopilot (void)
     }
 
     // Apply the throttle control
-    
-  
+  double height;
+  height = position.abs() - MARS_RADIUS;
+  if (fout.is_open()); {
+      fout << height << ' ' << descent_rate << endl;
+    }
   }
 
 void numerical_dynamics (void)
@@ -60,7 +67,7 @@ void numerical_dynamics (void)
     vector3d gravity, thrust, drag, force, acceleration, current_position, position_new;
     static vector3d position_prev;
     t=0;
-    fuel_mass = (FUEL_CAPACITY - FUEL_RATE_AT_MAX_THRUST * t) * FUEL_DENSITY;
+    fuel_mass = fuel * FUEL_CAPACITY * FUEL_DENSITY; // fuel capacity * fuel density * fuel, assumes thrust is on full thrust since t = 0.
     current_mass = UNLOADED_LANDER_MASS + fuel_mass;
     gravity = -GRAVITY * MARS_MASS * current_mass * position.norm() / position.abs2();
     thrust = thrust_wrt_world();
@@ -84,8 +91,12 @@ void numerical_dynamics (void)
     // Verlet
     current_position = position;
     if (simulation_time == 0) {
+      if (fout.is_open()) {
+          fout.close();
+      }
+      fout.open("telemetryX5.txt", ios::trunc);
       position_prev = position - velocity * delta_t;
-      position_new = 2 * position - position_prev + acceleration * (delta_t * delta_t);
+      position_new = 2 * position - position_prev + acceleration * (delta_t * delta_t); // essentially position + vel*delta_t (which is euler) + 0.5 a delta_t^2, alt - do euler for prev pos then do verlet
     }
     else {
       position_new = 2 * position - position_prev + acceleration * (delta_t * delta_t);
@@ -100,7 +111,7 @@ void numerical_dynamics (void)
   // Here we can apply 3-axis stabilization to ensure the base is always pointing downwards
   if (stabilized_attitude) attitude_stabilization();
 
-  // Write height & descent_Rate to file
+  /*// Write height & descent_Rate to file
   double height, descent_rate;
   height = position.abs() - MARS_RADIUS;
   descent_rate = velocity * position.norm();
@@ -115,9 +126,10 @@ void numerical_dynamics (void)
       }
       fout.close();
   }
+
   else { //file did not open successfully
       cout << "Could not open telemetry file for writing" << endl;
-  }
+  }*/
   
 }
 
